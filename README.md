@@ -4,7 +4,7 @@ Aplicación web personal para registrar la glucosa de María de los Ángeles Anc
 
 ## Incluye
 
-- Tres mediciones diarias: al comenzar el día (en ayunas), tarde y noche.
+- Tres mediciones diarias antes de cada comida: mañana, tarde y noche.
 - Hora opcional de cada medición y un historial de los últimos 90 registros.
 - PostgreSQL, una base de datos SQL real, lista para desarrollo local o despliegue.
 

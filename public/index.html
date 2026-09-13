@@ -8,29 +8,39 @@
 </head>
 <body>
   <main class="container">
-    <header>
+    <header class="app-header">
       <p class="eyebrow">Registro personal de salud</p>
-      <h1>Salud María</h1>
+      <h1>Salud <span>María</span></h1>
       <p id="patient-info" class="muted"></p>
     </header>
 
-    <section class="date-bar" aria-label="Fecha del registro">
-      <label for="record-date">Fecha</label>
-      <input id="record-date" type="date">
-      <button id="load-date" class="secondary">Ver día</button>
-    </section>
+    <div class="tabs" role="tablist" aria-label="Secciones de salud">
+      <button class="tab active" type="button" role="tab" aria-selected="true" data-tab="glucose">Glucosa</button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-tab="medications">Medicamentos</button>
+    </div>
 
-    <section aria-labelledby="glucose-title">
-      <div class="section-heading">
-        <div><p class="eyebrow">La primera toma es al comenzar el día</p><h2 id="glucose-title">Glucosa</h2></div>
+    <section role="tabpanel" data-panel="glucose" aria-labelledby="glucose-title">
+      <div class="date-bar" aria-label="Fecha del registro">
+        <label for="record-date">Fecha</label>
+        <input id="record-date" type="date">
+        <button id="load-date" class="secondary">Ver día</button>
+      </div>
+      <div class="section-heading glucose-heading">
+        <div><p class="eyebrow">Antes de cada comida</p><h2 id="glucose-title">Glucosa</h2></div>
         <span>mg/dL</span>
       </div>
       <div id="glucose-cards" class="glucose-grid"></div>
+
+      <section aria-labelledby="history-title">
+      <div class="section-heading history-heading"><div><h2 id="history-title">Historial de glucosa</h2></div><span>Registros guardados</span></div>
+      <div id="history" class="history-list"></div>
+      </section>
     </section>
 
-    <section aria-labelledby="history-title">
-      <div class="section-heading"><div><p class="eyebrow">Últimos registros</p><h2 id="history-title">Historial de glucosa</h2></div></div>
-      <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Momento</th><th>Glucosa</th><th>Hora</th></tr></thead><tbody id="history"></tbody></table></div>
+    <section role="tabpanel" data-panel="medications" hidden aria-labelledby="medications-title">
+      <div class="section-heading"><div><p class="eyebrow">Referencia de tratamiento</p><h2 id="medications-title">Medicamentos</h2></div></div>
+      <p class="muted">Esta pestaña muestra la rutina indicada. No registra tomas ni horarios.</p>
+      <div id="medication-groups"></div>
     </section>
   </main>
   <template id="glucose-template">

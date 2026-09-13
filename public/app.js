@@ -1,9 +1,14 @@
-const labels = { morning: 'Al comenzar el día (en ayunas)', afternoon: 'Tarde', night: 'Noche' };
+const labels = { morning: 'Mañana', afternoon: 'Tarde', night: 'Noche' };
+const moments = {
+  fasting: 'En ayunas', morning: 'Después del desayuno', mid_morning: 'Media mañana',
+  after_lunch: 'Después del almuerzo', evening: 'Tarde', after_dinner: 'Después de cenar', bedtime: 'Antes de dormir'
+};
 const dateInput = document.querySelector('#record-date');
 let current = null;
 
 dateInput.value = new Date().toISOString().slice(0, 10);
 document.querySelector('#load-date').addEventListener('click', loadDay);
+document.querySelectorAll('[role="tab"]').forEach(tab => tab.addEventListener('click', () => showTab(tab.dataset.tab)));
 
 function flash(node, message, error = false) {
   node.textContent = message;
@@ -25,12 +30,6 @@ function renderGlucose() {
     const node = document.querySelector('#glucose-template').content.cloneNode(true);
     const card = node.querySelector('article'); const record = saved[period];
     card.querySelector('h3').textContent = labels[period];
-    if (period === 'morning') {
-      const hint = document.createElement('p');
-      hint.className = 'glucose-hint';
-      hint.textContent = 'Sin horario fijo: antes de comer, cuando comienza el día.';
-      card.querySelector('h3').after(hint);
-    }
     card.querySelector('.glucose-value').value = record?.value_mg_dl || '';
     card.querySelector('.glucose-time').value = record?.measured_at?.slice(0, 5) || '';
     card.querySelector('.save-glucose').addEventListener('click', async () => {
@@ -46,9 +45,48 @@ function renderGlucose() {
   }
 }
 
+async function renderMedications() {
+  const host = document.querySelector('#medication-groups');
+  try {
+    const medications = await request('/api/medications');
+    const groups = medications.reduce((result, medication) => ((result[medication.moment] ||= []).push(medication), result), {});
+    host.innerHTML = '';
+    Object.entries(groups).forEach(([moment, items]) => {
+      const section = document.createElement('section');
+      section.className = `medication-group ${moment}`;
+      const title = document.createElement('h3'); title.textContent = moments[moment]; section.append(title);
+      items.forEach(item => {
+        const article = document.createElement('article'); article.className = 'medication-reference';
+        const name = document.createElement('h4'); name.textContent = item.name;
+        const dosage = document.createElement('p'); dosage.textContent = item.dosage;
+        article.append(name, dosage); section.append(article);
+      });
+      host.append(section);
+    });
+  } catch (err) { host.textContent = err.message; }
+}
+
+function showTab(tabName) {
+  document.querySelectorAll('[role="tab"]').forEach(tab => {
+    const selected = tab.dataset.tab === tabName;
+    tab.classList.toggle('active', selected); tab.setAttribute('aria-selected', selected);
+  });
+  document.querySelectorAll('[role="tabpanel"]').forEach(panel => {
+    panel.hidden = panel.dataset.panel !== tabName;
+  });
+  if (tabName === 'medications' && !document.querySelector('#medication-groups').children.length) renderMedications();
+}
+
 async function loadHistory() {
   const records = await request('/api/history');
-  document.querySelector('#history').innerHTML = records.length ? records.map(row => `<tr><td>${row.measured_on.slice(0,10).split('-').reverse().join('/')}</td><td>${labels[row.period]}</td><td>${row.value_mg_dl} mg/dL</td><td>${row.measured_at?.slice(0,5) || '—'}</td></tr>`).join('') : '<tr><td colspan="4">Aún no hay registros.</td></tr>';
+  const history = document.querySelector('#history');
+  history.innerHTML = records.length ? records.map(row => `
+    <article class="history-record">
+      <time class="history-date" datetime="${row.measured_on.slice(0, 10)}">${row.measured_on.slice(0, 10).split('-').reverse().join('/')}</time>
+      <span class="period-pill ${row.period}">${labels[row.period]}</span>
+      <strong class="history-value">${row.value_mg_dl}<small>mg/dL</small></strong>
+      <span class="history-time">${row.measured_at?.slice(0, 5) || 'Sin hora'}</span>
+    </article>`).join('') : '<p class="empty-history">Aún no hay registros.</p>';
 }
 
 async function loadDay() {

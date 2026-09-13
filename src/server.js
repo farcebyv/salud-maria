@@ -52,6 +52,17 @@ app.get('/api/history', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+app.get('/api/medications', async (req, res, next) => {
+  try {
+    const patient = await maria();
+    const { rows } = await pool.query(
+      'SELECT name, dosage, moment FROM medications WHERE patient_id = $1 AND active = true ORDER BY sort_order',
+      [patient.id]
+    );
+    res.json(rows);
+  } catch (error) { next(error); }
+});
+
 app.use((error, req, res, next) => {
   console.error(error);
   res.status(500).json({ message: 'No fue posible guardar la información.', detail: error.message });
