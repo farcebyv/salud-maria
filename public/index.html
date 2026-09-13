@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Salud María</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <p class="eyebrow">Registro personal de salud</p>
+      <h1>Salud María</h1>
+      <p id="patient-info" class="muted"></p>
+    </header>
+
+    <section class="date-bar" aria-label="Fecha del registro">
+      <label for="record-date">Fecha</label>
+      <input id="record-date" type="date">
+      <button id="load-date" class="secondary">Ver día</button>
+    </section>
+
+    <section aria-labelledby="glucose-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">La primera toma es al comenzar el día</p><h2 id="glucose-title">Glucosa</h2></div>
+        <span>mg/dL</span>
+      </div>
+      <div id="glucose-cards" class="glucose-grid"></div>
+    </section>
+
+    <section aria-labelledby="history-title">
+      <div class="section-heading"><div><p class="eyebrow">Últimos registros</p><h2 id="history-title">Historial de glucosa</h2></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Momento</th><th>Glucosa</th><th>Hora</th></tr></thead><tbody id="history"></tbody></table></div>
+    </section>
+  </main>
+  <template id="glucose-template">
+    <article class="card glucose-card"><h3></h3><label>Valor <input class="glucose-value" type="number" inputmode="numeric" min="20" max="700" placeholder="Ej. 110"></label><label>Hora <input class="glucose-time" type="time"></label><button class="save-glucose">Guardar</button><p class="status" aria-live="polite"></p></article>
+  </template>
+  <script src="app.js"></script>
+</body>
+</html>
